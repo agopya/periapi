@@ -23,7 +23,7 @@ PUBLIC_ACCESS = "https://api.periscope.tv/api/v2/getAccessPublic?broadcast_id={0
 PRIVATE_ACCESS = "https://api.periscope.tv/api/v2/accessChannel"
 
 FAIL_RESUME_WAIT = 15
-MAX_DOWNLOAD_ATTEMPTS = 6
+MAX_DOWNLOAD_ATTEMPTS = 3
 DEFAULT_DL_THREADS = 6
 
 EXTENSIONS = ['.mp4', '.ts']

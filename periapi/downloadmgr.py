@@ -11,7 +11,7 @@ from periapi.download import Download
 
 
 CORES_TO_USE = os.cpu_count()
-MAX_DOWNLOAD_ATTEMPTS = 6
+MAX_DOWNLOAD_ATTEMPTS = 3
 
 
 def current_datetimestring():
