@@ -6,6 +6,8 @@ Periscope API for the masses
 import os
 from dateutil.parser import parse as dt_parse
 
+from dateutil.tz import tzlocal
+
 
 class BroadcastDownloadInfo:
     """Contains information about the broadcast's download but not about the broadcast itself"""
@@ -125,12 +127,12 @@ class Broadcast(BroadcastDownloadInfo):
     @property
     def startdate(self):
         """Human-readable date string of when broadcast started"""
-        return self.start_dt.strftime('%m/%d/%Y')
+        return self.start_dt.strftime('%m/%d/%Y').replace(tzinfo=tzlocal())
 
     @property
     def starttime(self):
         """Human-readable time string of when broadcast started"""
-        return self.start_dt.strftime('%H:%M:%S')
+        return self.start_dt.strftime('%H:%M:%S').replace(tzinfo=tzlocal())
 
     @property
     def title(self):

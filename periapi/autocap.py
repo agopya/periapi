@@ -35,6 +35,7 @@ class AutoCap:
     def start(self):
         """Starts autocapper loop"""
 
+        loops = 0
         while self.keep_running:
 
             new_broadcasts = self.listener.check_for_new()
@@ -44,7 +45,7 @@ class AutoCap:
                     self.downloadmgr.start_dl(broadcast)
 
             if not self.quiet_mode:
-                print(self.downloadmgr.status)
+                loops = self.print_current_status(loops)
 
             time.sleep(self.interval)
 
@@ -60,10 +61,14 @@ class AutoCap:
         broadcast_info = self.api.get_access(broadcast_id).get('broadcast')
         broadcast = Broadcast(self.api, broadcast_info)
         self.downloadmgr.start_dl(broadcast)
-        while len(self.downloadmgr.active_downloads) > 0:
+        _ = len(self.downloadmgr.active_downloads)
+        while _ > 0:
             if not self.quiet_mode:
                 print(self.downloadmgr.status)
             time.sleep(self.interval)
+            self.downloadmgr.sema.acquire()
+            _ = len(self.downloadmgr.active_downloads)
+            self.downloadmgr.sema.release()
         self.downloadmgr.pool.close()
         self.downloadmgr.pool.join()
 
@@ -77,12 +82,29 @@ class AutoCap:
         for i in broadcasts:
             broadcast = Broadcast(self.api, i)
             self.downloadmgr.start_dl(broadcast)
-        while len(self.downloadmgr.active_downloads) > 0:
+        _ = len(self.downloadmgr.active_downloads)
+        while _ > 0:
             if not self.quiet_mode:
                 print(self.downloadmgr.status)
             time.sleep(self.interval)
+            self.downloadmgr.sema.acquire()
+            _ = len(self.downloadmgr.active_downloads)
+            self.downloadmgr.sema.release()
         self.downloadmgr.pool.close()
         self.downloadmgr.pool.join()
+
+    def print_current_status(self, loops):
+        """Prints current status and lists active downloads every so often"""
+        print(self.downloadmgr.status)
+        if (loops * self.interval) > 150:
+            loops = 0
+            if len(self.downloadmgr.currently_downloading) > 0:
+                print("\tCurrently downloading:")
+                for bc_title in self.downloadmgr.currently_downloading:
+                    print("\t{}".format(bc_title))
+        else:
+            loops += 1
+        return loops
 
     @property
     def interval(self):
